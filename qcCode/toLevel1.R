@@ -62,7 +62,7 @@ for(i in eStringCols){
 eDat$race <- gsub('[', '', gsub(']', '', eDat$race, fixed=T), fixed=T)
 eDat$externalId <- NULL
 eDat$uploadDate <- NULL
-eTabNew$Enter_State <- NULL
+eDat$Enter_State <- NULL
 eDat$`packs-per-day` <- as.integer(eDat$`packs-per-day`)
 
 eDat <- subsetThis(eDat)
@@ -123,46 +123,6 @@ pDat$uploadDate <- NULL
 pDat <- subsetThis(pDat)
 rownames(pDat) <- pDat$recordId
 
-#####
-## MY THOUGHTS (FEELINGS)
-#####
-# fId <- c("syn4961477")
-# fSc <- synGet(fId)
-# 
-# fTab <- synTableQuery('SELECT * FROM syn4961477')
-# fDat <- fTab@values
-# fDat$externalId <- NULL
-# fDat$uploadDate <- NULL
-# fDat <- subsetThis(fDat)
-# 
-# fBetter <- sapply(as.list(rownames(fDat)), function(rn){
-#   if( is.na(fDat[rn, "feeling_better"]) ){
-#     return(NA)
-#   } else{
-#     # pp <- synDownloadTableFile(fId, rn, "feeling_better")
-#     pp <- list.files(file.path(synapseCacheDir(), as.numeric(fDat[rn, "feeling_better"]) %% 1000, fDat[rn, "feeling_better"]), full.names = T)
-#     ll <- readLines(pp, warn=FALSE)
-#     return(ll)
-#   }
-# })
-# fBetter <- gsub(',', '', gsub('"', '', fBetter, fixed=T), fixed=T)
-# fWorse <- sapply(as.list(rownames(fDat)), function(rn){
-#   if( is.na(fDat[rn, "feeling_worse"]) ){
-#     return(NA)
-#   } else{
-#     # pp <- synDownloadTableFile(fId, rn, "feeling_worse")
-#     pp <- list.files(file.path(synapseCacheDir(), as.numeric(fDat[rn, "feeling_worse"]) %% 1000, fDat[rn, "feeling_worse"]), full.names = T)
-#     ll <- readLines(pp, warn=FALSE)
-#     return(ll)
-#   }
-# })
-# fWorse <- gsub(',', '', gsub('"', '', fWorse, fixed=T), fixed=T)
-# fDat$betterLong <- nchar(fBetter) > 1000
-# fDat$betterReason <- substr(fBetter, 1, 1000)
-# fDat$worseLong <- nchar(fWorse) > 1000
-# fDat$worseReason <- substr(fWorse, 1, 1000)
-# 
-# rownames(fDat) <- fDat$recordId
 
 #####
 ## MEMORY
@@ -234,8 +194,7 @@ vFirst <- lapply(as.list(vId1), function(x){
     if( is.na(vals[rn, "momentInDayFormat.json"]) ){
       return(c(choiceAnswers=NA))
     } else{
-      # loc <- synDownloadTableFile(x, rn, "momentInDayFormat.json")
-      loc <- list.files(file.path(synapseCacheDir(), as.numeric(vals[rn, "momentInDayFormat.json"]) %% 1000, vals[rn, "momentInDayFormat.json"]), full.names = T)
+      loc <- synDownloadTableFile(x, rn, "momentInDayFormat.json")
       dat <- try(fromJSON(file=loc))
       if( class(dat) == "try-error" ){
         return(c(choiceAnswers=NA))
@@ -355,7 +314,6 @@ newParent <- "syn4993293"
 storeThese <- list('Demographics Survey' = list(vals=eDat, fhCols=NULL),
                    'UPDRS Survey' = list(vals=uDat, fhCols=NULL),
                    'PDQ8 Survey' = list(vals=pDat, fhCols=NULL),
-                   # 'Feelings Survey' = list(vals=fDat, fhCols=c("feeling_better", "feeling_worse")),
                    'Memory Activity' = list(vals=mDat, fhCols=intersect(names(mDat), mFilehandleCols)),
                    'Tapping Activity' = list(vals=tDat, fhCols=intersect(names(tDat), tFilehandleCols)),
                    'Voice Activity' = list(vals=vDat, fhCols=intersect(names(vDat), vFilehandleCols)),

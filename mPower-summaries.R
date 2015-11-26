@@ -44,7 +44,8 @@ finalPlots <- lapply(plotDat, function(x){
   return(tPlot)
 })
 
-facetDat <- lapply(names(plotDat)[4:7], function(x){
+theseTasks <- c("Memory Activity", "Walking Activity", "Voice Activity", "Tapping Activity")
+facetDat <- lapply(as.list(theseTasks), function(x){
   tmp <- plotDat[[x]]
   tmpTab <- as.data.frame(table(tmp$date, tmp$Count))
   names(tmpTab) <- c("date", "Count", "freq")
@@ -55,7 +56,7 @@ facetDat <- lapply(names(plotDat)[4:7], function(x){
 })
 facetDat <- do.call(rbind, facetDat)
 facetDat$date <- as.Date(facetDat$date)
-facetDat$taskName <- factor(facetDat$taskName, levels = c("Memory Activity", "Walking Activity", "Voice Activity", "Tapping Activity"))
+facetDat$taskName <- factor(facetDat$taskName, levels = theseTasks)
 
 fPlot <- ggplot(data=facetDat, aes(date, freqCum, fill=Count)) + 
   facet_grid(taskName ~ .) +

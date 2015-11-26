@@ -29,10 +29,9 @@ whichFilehandle <- function(x){
 ## x IS A DATAFRAME TO BE SUBSETTING STANDARDLY
 subsetThis <- function(x){
   xSub <- x[, setdiff(names(x), coreNames)]
-  # table(rowSums(is.na(xSub)))
   xIdx <- rowSums(is.na(xSub)) != ncol(xSub)
   x <- x[ xIdx, ]
-  x <- x[ as.Date(x$createdOn) >= firstDate | as.Date(x$createdOn) <= lastDate, ]
+  x <- x[ as.Date(x$createdOn) >= firstDate & as.Date(x$createdOn) <= lastDate, ]
   x <- x[ x$appVersion %in% releaseVersions, ]
   x[ order(x$createdOn), ]
 }

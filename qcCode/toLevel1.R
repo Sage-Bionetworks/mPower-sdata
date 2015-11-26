@@ -188,13 +188,15 @@ vFilehandleCols <- whichFilehandle(vSc@columns)
 
 ## FIRST SET OF IDS HAVE TO PARSE INTO momentInDayFormat.json FILES TO EXTRACT MED INFO
 vFirst <- lapply(as.list(vId1), function(x){
-  vals <- synTableQuery(paste0("SELECT * FROM ", x, " WHERE appVersion NOT LIKE '%YML%'"))@values
+  vTab <- synTableQuery(paste0("SELECT * FROM ", x, " WHERE appVersion NOT LIKE '%YML%'"))
+  vals <- vTab@values
   
+  vMap <- synDownloadTableColumns(vTab, "momentInDayFormat.json")
   vMID <- sapply(as.list(rownames(vals)), function(rn){
     if( is.na(vals[rn, "momentInDayFormat.json"]) ){
       return(c(choiceAnswers=NA))
     } else{
-      loc <- synDownloadTableFile(x, rn, "momentInDayFormat.json")
+      loc <- vMap[[vals[rn, "momentInDayFormat.json"]]]
       dat <- try(fromJSON(file=loc))
       if( class(dat) == "try-error" ){
         return(c(choiceAnswers=NA))

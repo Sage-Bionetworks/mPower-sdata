@@ -63,11 +63,15 @@ eDat$externalId <- NULL
 eDat$uploadDate <- NULL
 eDat$Enter_State <- NULL
 eDat$`packs-per-day` <- as.integer(eDat$`packs-per-day`)
+eDat$age[ which(eDat$age>90 & eDat$age<101) ] <- 90
 
 eDat <- subsetThis(eDat)
 ## KEEP THE FIRST INSTANCE OF ENROLLMENT SURVEY
 eDat <- eDat[ !duplicated(eDat$healthCode), ]
 rownames(eDat) <- eDat$recordId
+
+## THESE ENTERED INVALID AGES - EVEN THOUGH TWICE IN REGISTRATION CERTIFIED THAT OVER 18
+theseOnes <- eDat$healthCode[ which(eDat$age < 18  | eDat$age > 100) ]
 
 #####
 ## UPDRS
@@ -267,7 +271,7 @@ rownames(wDat) <- wDat$recordId
 
 ################################################
 ################################################
-## NOW DO MESSY CLEANUP OF MISSING MED DATA FOR ACTIVITIES
+## NOW DO CLEANUP OF MISSING MED DATA FOR ACTIVITIES
 theseColumns <- c("recordId", "healthCode", "createdOn", "momentInDayFormat.json.choiceAnswers")
 allActs <- rbind(mDat[, theseColumns], tDat[, theseColumns], vDat[, theseColumns], wDat[, theseColumns])
 allActs <- allActs[ order(allActs$healthCode, allActs$createdOn), ]
@@ -322,8 +326,10 @@ storeThese <- list('Demographics Survey' = list(vals=eDat, fhCols=NULL),
 
 ## NOW LETS DO SOMETHING WITH ALL OF THIS DATA
 storeThese <- lapply(storeThese, function(tt){
-  ## USE TAB DELIMITED FOR CASES WHERE COMMAS ARE USED IN TEXT FIELDS
-  tcs <- as.tableColumns(tt$vals)
+  ## REMOVE theseOnes
+  tmp <- tt$vals
+  tmp <- tmp[ which(!(tmp$healthCode %in% theseOnes)), ]
+  tcs <- as.tableColumns(tmp)
   for(i in 1:length(tcs$tableColumns)){
     ## NAMES IN tcs HAVE . REMOVED - NEED TO KEEP CONSISTENT
     tcs$tableColumns[[i]]@name <- names(tt$vals)[i]

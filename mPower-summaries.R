@@ -1,4 +1,5 @@
 require(synapseClient)
+require(rGithubClient)
 require(ggplot2)
 synapseLogin()
 
@@ -18,6 +19,9 @@ names(allDat) <- q$table.name
 allParticipants <- lapply(lapply(allDat, "[[", "healthCode"), unique)
 length(unique(unlist(allParticipants)))
 
+## PARKINSON DIAGNOSIS
+table(allDat$`Demographics Survey`$`professional-diagnosis`, useNA = 'always')
+
 ## PER TABLE METRICS
 tableSummaries <- data.frame(uniqueParticipants = sapply(allParticipants, length),
                              uniqueTasks = sapply(allDat, nrow), stringsAsFactors = FALSE)
@@ -32,16 +36,6 @@ plotDat <- lapply(allDat, function(x){
   res1$Count <- "tasks"
   res2$Count <- "participants"
   return(rbind(res1, res2))
-})
-
-finalPlots <- lapply(plotDat, function(x){
-  x$Count <- factor(x$Count, levels=c("participants", "tasks"))
-  tPlot <- ggplot(data=x, aes(date, fill=Count)) + 
-    geom_histogram(data=x[x$Count=="tasks", ], aes(y=cumsum(..count..)), alpha=.5, position="identity", binwidth=1) +
-    geom_histogram(data=x[x$Count=="participants", ], aes(y=cumsum(..count..)), alpha=.5, position="identity", binwidth=1) +
-    xlim(firstDate, lastDate) +
-    labs(x="Date", y="Cumulative Count")
-  return(tPlot)
 })
 
 theseTasks <- c("Memory Activity", "Walking Activity", "Voice Activity", "Tapping Activity")
@@ -62,11 +56,23 @@ fPlot <- ggplot(data=facetDat, aes(date, freqCum, fill=Count)) +
   facet_grid(taskName ~ .) +
   geom_bar(alpha=.5, position="identity", stat="identity") + 
   xlim(firstDate, lastDate) +
+  scale_fill_grey(start=0) +
+  theme_bw() + 
   labs(x="Date", y="Cumulative Count") + 
   theme(legend.position="bottom")
 
-fName <- file.path(tempdir(), "facetPlot.png")
+fName <- file.path(tempdir(), "figure2-participantActivities.png")
 png(fName, width = 5, height = 6, units = "in", res = 400)
 show(fPlot)
 dev.off()
+
+## GET THIS CODE STORED IN GITHUB
+mpowerRepo <- getRepo('brian-bot/mPower-sdata')
+thisCode <- getPermlink(mpowerRepo, 'mPower-summaries.R')
+
+## STORE THE PLOT IN SYNAPSE
+finalOutput <- synStore(File(path=fName, parentId="syn5480005"), 
+                        used=lapply(as.list(q$table.id), function(x){list(entity=x)}),
+                        executed=list(list(url=thisCode, name=basename(thisCode))),
+                        activityName="Figure Generation")
 

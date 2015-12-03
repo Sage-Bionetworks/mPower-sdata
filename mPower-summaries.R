@@ -72,7 +72,7 @@ thisCode <- getPermlink(mpowerRepo, 'mPower-summaries.R')
 
 ## STORE THE PLOT IN SYNAPSE
 finalOutput <- synStore(File(path=fName, parentId="syn5480005"), 
-                        used=lapply(as.list(q$table.id), function(x){list(entity=x)}),
+                        used=lapply(as.list(q$table.id[q$table.name %in% theseTasks]), function(x){list(entity=x)}),
                         executed=list(list(url=thisCode, name=basename(thisCode))),
                         activityName="Figure Generation")
 

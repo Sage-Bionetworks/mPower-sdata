@@ -62,8 +62,22 @@ eDat$race <- gsub('[', '', gsub(']', '', eDat$race, fixed=T), fixed=T)
 eDat$externalId <- NULL
 eDat$uploadDate <- NULL
 eDat$Enter_State <- NULL
+eDat$`last-smoked` <- as.numeric(format(eDat$`last-smoked`, "%Y"))
+eDat$employment[ which(eDat$employment=="Military") ] <- "Employment for wages"
+eDat$employment[ which(eDat$employment=="Out of work but not currently looking for work") ] <- "Out of work"
+eDat$employment[ which(eDat$employment=="Out of work and looking for work") ] <- "Out of work"
 eDat$`packs-per-day` <- as.integer(eDat$`packs-per-day`)
 eDat$age[ which(eDat$age>90 & eDat$age<101) ] <- 90
+
+## PULL IN THE COMORBIDITIES
+eComFiles <- synDownloadTableColumns(eTab, "health-history")
+eCom <- sapply(eComFiles, readLines)
+for(rn in rownames(eDat)){
+  if(!is.na(eDat[rn, "health-history"])){
+    eDat[rn, "health-history"] <- eCom[[eDat[rn, "health-history"]]]
+  }
+}
+eDat$`health-history` <- gsub(' (TIA)', '', gsub(' (COPD)', '', gsub('[', '', gsub(']', '', eDat$`health-history`, fixed=T), fixed=T), fixed=T), fixed=T)
 
 eDat <- subsetThis(eDat)
 ## KEEP THE FIRST INSTANCE OF ENROLLMENT SURVEY

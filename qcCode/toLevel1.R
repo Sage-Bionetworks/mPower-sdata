@@ -26,16 +26,6 @@ whichFilehandle <- function(x){
   return(cc)
 }
 
-## x IS A DATAFRAME TO BE SUBSETTING STANDARDLY
-subsetThis <- function(x){
-  xSub <- x[, setdiff(names(x), coreNames)]
-  xIdx <- rowSums(is.na(xSub)) != ncol(xSub)
-  x <- x[ xIdx, ]
-  x <- x[ as.Date(x$createdOn) >= firstDate & as.Date(x$createdOn) <= lastDate, ]
-  x <- x[ x$appVersion %in% releaseVersions, ]
-  x[ order(x$createdOn), ]
-}
-
 
 #####
 ## ENROLLMENT
@@ -79,13 +69,25 @@ for(rn in rownames(eDat)){
 }
 eDat$`health-history` <- gsub(' (TIA)', '', gsub(' (COPD)', '', gsub('[', '', gsub(']', '', eDat$`health-history`, fixed=T), fixed=T), fixed=T), fixed=T)
 
-eDat <- subsetThis(eDat)
 ## KEEP THE FIRST INSTANCE OF ENROLLMENT SURVEY
 eDat <- eDat[ !duplicated(eDat$healthCode), ]
 rownames(eDat) <- eDat$recordId
 
 ## THESE ENTERED INVALID AGES - EVEN THOUGH TWICE IN REGISTRATION CERTIFIED THAT OVER 18
 theseOnes <- eDat$healthCode[ which(eDat$age < 18  | eDat$age > 100) ]
+
+## x IS A DATAFRAME TO BE SUBSETTING STANDARDLY
+subsetThis <- function(x){
+  xSub <- x[, setdiff(names(x), coreNames)]
+  xIdx <- rowSums(is.na(xSub)) != ncol(xSub)
+  x <- x[ xIdx, ]
+  x <- x[ as.Date(x$createdOn) >= firstDate & as.Date(x$createdOn) <= lastDate, ]
+  x <- x[ x$appVersion %in% releaseVersions, ]
+  x <- x[ which(!(x$healthCode %in% theseOnes)), ]
+  x <- x[ which(!duplicated(x[, c("healthCode", "createdOn")])), ]
+  x[ order(x$createdOn), ]
+}
+eDat <- subsetThis(eDat)
 
 #####
 ## UPDRS
@@ -136,6 +138,9 @@ for(i in pStringCols){
 }
 pDat$externalId <- NULL
 pDat$uploadDate <- NULL
+pDat$`PDQ8-4` <- pDat$`PQD8-4`
+pDat$`PQD8-4` <- NULL
+pDat <- pDat[, c(names(pDat)[-grep("PDQ", names(pDat))], paste('PDQ8', 1:8, sep="-"))]
 
 pDat <- subsetThis(pDat)
 rownames(pDat) <- pDat$recordId
@@ -338,30 +343,17 @@ storeThese <- list('Demographics Survey' = list(vals=eDat, fhCols=NULL),
                    'Voice Activity' = list(vals=vDat, fhCols=intersect(names(vDat), vFilehandleCols)),
                    'Walking Activity' = list(vals=wDat, fhCols=grep("json.items", names(wDat), value = TRUE)))
 
-## NOW LETS DO SOMETHING WITH ALL OF THIS DATA
-storeThese <- lapply(storeThese, function(tt){
-  ## REMOVE theseOnes
-  tmp <- tt$vals
-  tmp <- tmp[ which(!(tmp$healthCode %in% theseOnes)), ]
-  tcs <- as.tableColumns(tmp)
-  for(i in 1:length(tcs$tableColumns)){
-    ## NAMES IN tcs HAVE . REMOVED - NEED TO KEEP CONSISTENT
-    tcs$tableColumns[[i]]@name <- names(tt$vals)[i]
-    if(tcs$tableColumns[[i]]@name %in% tt$fhCols){
-      tcs$tableColumns[[i]]@columnType <- "FILEHANDLEID"
-      tcs$tableColumns[[i]]@defaultValue <- character(0)
-      tcs$tableColumns[[i]]@maximumSize <- integer(0)
-      tcs$tableColumns[[i]]@enumValues <- character(0)
-    }
-  }
-  return(tcs)
-})
+## SCHEMAS ALREADY STORED - FIND THEM
+qq <- synQuery(paste0('SELECT id, name FROM table WHERE parentId=="', newParent, '"'))
 
+## NOW LETS DO SOMETHING WITH ALL OF THIS DATA
 ## FINALLY, STORE THE OUTPUT
 for(i in 1:length(storeThese)){
-  theEnd <- synStore(Table(TableSchema(name=names(storeThese)[i],
-                                       parent=newParent,
-                                       columns=storeThese[[i]]$tableColumns),
-                           values = storeThese[[i]]$fileHandleId))
+  thisId <- qq$table.id[qq$table.name == names(storeThese)[i]]
+  ## REMOVE ALL ROWS FROM THE TABLE, IF THERE ARE ANY
+  delThese <- synTableQuery(paste0('SELECT * FROM ', thisId))
+  delThese <- synDeleteRows(delThese)
+  thisFile <- as.tableColumns(storeThese[[i]]$vals)
+  theEnd <- synStore(Table(synGet(thisId), thisFile$fileHandleId))
 }
 

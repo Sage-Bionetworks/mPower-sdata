@@ -1,4 +1,8 @@
-### mPower Public Researcher Portal Synapse Project
+## mPower mobile study of Parkinson Disease (PD)
+In March 2015, Sage Bionetworks in partnership with the University of Rochester launched an observational smartphone-based study developed using Apple's ResearchKit library to evaluate the feasibility of remotely collecting frequent information about the daily changes in symptom severity and their sensitivity to medication in PD. These data provide the ability to explore classification of control participants and those who self-report having PD, as well as to begin to measure the severity of PD for those with the disease. There are myriad additional questions from each of the varying streams of data that will require a community of researchers to explore fully.
+
+-----
+### mPower Public Researcher Portal
 The [mPower Public Researcher Portal](https://www.synapse.org/mpower) Synapse Project is the home for all documentation about the mPower study and instructions for the use of the coded data consisting of survey responses and mobile sensor measurements from active tasks.
 
 [Synapse](https://www.synapse.org) is a general-purpose data and analysis sharing service where members can work collaboratively, analyze data, share insights and have attributions and provenance of those insights to share with others. Synapse is developed and operated by [Sage Bionetworks](http://sagebase.org/) as a service to the health research community.

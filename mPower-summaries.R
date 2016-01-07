@@ -63,8 +63,8 @@ pPlot <- ggplot(data=facetDat, aes(date, freqCum, fill=Count)) +
   labs(x="Date", y="Cumulative Count") + 
   theme(legend.position="bottom")
 
-fName2 <- file.path(tempdir(), "figure2-participantActivities.png")
-png(fName2, width = 5, height = 6, units = "in", res = 400)
+fName2 <- file.path(tempdir(), "figure2-participantActivities.pdf")
+pdf(fName2, width = 6, height = 8)
 show(pPlot)
 dev.off()
 
@@ -98,8 +98,8 @@ dPlot <- ggplot(dd, aes(x=days, fill=diagnosis)) +
   labs(x="Days on app", y="Density") + 
   guides(fill=FALSE)
 
-fName3 <- file.path(tempdir(), "figure3-participantDays.png")
-png(fName3, width = 6, height = 5, units = "in", res = 400)
+fName3 <- file.path(tempdir(), "figure3-participantDays.pdf")
+pdf(fName3, width = 8, height = 6)
 show(dPlot)
 dev.off()
 

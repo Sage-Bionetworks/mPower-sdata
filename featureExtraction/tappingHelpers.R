@@ -5,7 +5,7 @@ GetXY <- function(x){
   as.numeric(strsplit(x, ", ")[[1]])
 }
 
-ShapeTappingData <- function(x) {
+ShapeTappingData <- function(x){
   time <- sapply(x, "[[", "TapTimeStamp")
   buttonid <- sapply(x, "[[", "TappedButtonId")
   tapcoord <- sapply(x, "[[", "TapCoordinate")
@@ -13,6 +13,21 @@ ShapeTappingData <- function(x) {
   X <- coord[1,]
   Y <- coord[2,]  
   data.frame(time=time, X=X, Y=Y, buttonid=buttonid)
+}
+
+CleanTappedButtonNone <- function(x){
+  il <- x$buttonid == "TappedButtonLeft"
+  ir <- x$buttonid == "TappedButtonRight"
+  ino <- x$buttonid == "TappedButtonNone"
+  xx <- rbind(x[il,], x[ir,], x[ino,])
+  delta <- xx$X - xx$Y
+  dupli <- duplicated(delta)
+  ## we only want to drop TappedButtonNone duplications 
+  nlr <- sum(il) + sum(ir)
+  dupli[seq(nlr)] <- FALSE
+  ############################
+  xx <- xx[which(!dupli),]
+  xx[order(xx[, 1]),]
 }
 
 ## Computes tapping time series

@@ -18,6 +18,7 @@ tapMap <- synDownloadTableColumns(tapTable, "tapping_results.json.TappingSamples
 allFeatures <- lapply(as.list(tapMap), function(x){
   rawDat <- fromJSON(file=x)
   tmp <- ShapeTappingData(rawDat)
+  tmp <- CleanTappedButtonNone(tmp)
   extractTapping(tmp)
 })
 names(allFeatures) <- names(tapMap)

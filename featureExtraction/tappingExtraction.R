@@ -38,5 +38,5 @@ write.table(featDf, file=fPath, sep="\t", row.names = FALSE, quote = FALSE)
 resFile <- synStore(File(path=fPath, parentId="syn5608426"),
                     activity=Activity(name="tapping feature extraction",
                                       used=list(list(entity=tapTable@schema, wasExecuted=FALSE),
-                                                list(url=helpCode, wasExecuted=FALSE),
-                                                list(url=execCode, wasExecuted=TRUE))))
+                                                list(url=helpCode, name=basename(helpCode), wasExecuted=FALSE),
+                                                list(url=execCode, name=basename(execCode), wasExecuted=TRUE))))

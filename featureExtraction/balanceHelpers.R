@@ -1,10 +1,6 @@
-
 require(RJSONIO)
 require(fractal)
 require(pracma)
-
-
-
 
 ShapeBalanceData <- function(x) {
   timestamp <- sapply(x, function(x) x$timestamp)
@@ -13,10 +9,8 @@ ShapeBalanceData <- function(x) {
   accel <- t(accel)
   accel <- accel * 9.8
   dat <- cbind(timestamp, accel)
-  dat
+  return(dat)
 }
-
-
 
 TrimData <- function(dat, timeStart = 5, timeEnd = NULL) {
   time <- dat[, "timestamp"]  
@@ -27,15 +21,14 @@ TrimData <- function(dat, timeStart = 5, timeEnd = NULL) {
   iEnd <- max(which(time <= timeEnd))
   dat <- dat[iStart:iEnd,]
   dat[, "timestamp"] <- dat[, "timestamp"] - dat[1, "timestamp"]
-  dat
+  return(dat)
 }
-
 
 GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL) {
   dat <- TrimData(dat, timeStart, timeEnd)
-  x <- dat[, "x"]
-  y <- dat[, "y"]
-  z <- dat[, "z"]
+  x <- dat$x
+  y <- dat$y
+  z <- dat$z
   aa <- sqrt(x^2 + y^2 + z^2)
   ###############################
   meanAA <- mean(aa, na.rm = TRUE)
@@ -59,9 +52,8 @@ GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL) {
                   "dfaAA")  
   bpa <- FeaturesBpa(dat)
   dis <- BoxVolumeFeature(dat)
-  c(out, bpa, dis)
+  return(c(out, bpa, dis))
 }
-
 
 FeaturesBpa <- function(post) {
   ft <- rep(NA, 3)
@@ -88,34 +80,40 @@ FeaturesBpa <- function(post) {
   # Output posture test feature vector
   ft <- c(postpeak, postpower, alpha)    
   names(ft) <- c("postpeak", "postpower", "alpha")
-  ft
+  return(ft)
 }
 
-
-Skewness <- function(x) {
+Skewness <- function(x){
   x <- x[!is.na(x)]
-  mu <- mean(x)
-  mean((x - mu)^3)/(mean((x - mu)^2)^(3/2))
+  if(length(x) < 3){
+    return(NA)
+  } else{
+    mu <- mean(x)
+    return(mean((x - mu)^3)/(mean((x - mu)^2)^(3/2)))
+  }
 }
 
-
-
-Kurtosis <- function(x) {
+Kurtosis <- function(x){
   x <- x[!is.na(x)]
-  mu <- mean(x)
-  mean((x - mu)^4)/(mean((x - mu)^2)^2)
+  if(length(x) < 3){
+    return(NA)
+  } else{
+    mu <- mean(x)
+    return(mean((x - mu)^4)/(mean((x - mu)^2)^2))
+  }
 }
 
-
-ZCR <- function(x) {
+ZCR <- function(x){
   x <- x[!is.na(x)]
-  n <- length(x)
-  aux.x <- rep(1, n)
-  aux.x[x <= mean(x)] <- -1
-  sum(aux.x[-n] * aux.x[-1] < 0)/(n - 1)  
+  if(length(x) < 3){
+    return(NA)
+  } else{
+    n <- length(x)
+    aux.x <- rep(1, n)
+    aux.x[x <= mean(x)] <- -1
+    return(sum(aux.x[-n] * aux.x[-1] < 0)/(n - 1))
+  }
 }
-
-
 
 GetDisplacement <- function(time, accel) {
   deltaTime <- diff(time)
@@ -128,25 +126,22 @@ GetDisplacement <- function(time, accel) {
     vel[i] <- vel[i-1] + 0.5 * (accel[i] + accel[i-1]) * deltaTime[i]
     dis[i] <- dis[i-1] + 0.5 * (vel[i] + vel[i-1]) * deltaTime[i]
   }
-  list(vel = vel, dis = dis)
+  return(list(vel = vel, dis = dis))
 }
 
-
-GetXYZDisplacement <- function(x) {
-  disX <- GetDisplacement(x[, "timestamp"], x[, "x"])$dis
-  disY <- GetDisplacement(x[, "timestamp"], x[, "y"])$dis
-  disZ <- GetDisplacement(x[, "timestamp"], x[, "z"])$dis
-  list(disX = disX, disY = disY, disZ = disZ)
+GetXYZDisplacement <- function(x){
+  disX <- GetDisplacement(x$timestamp, x$x)$dis
+  disY <- GetDisplacement(x$timestamp, x$y)$dis
+  disZ <- GetDisplacement(x$timestamp, x$z)$dis
+  return(list(disX = disX, disY = disY, disZ = disZ))
 }
-
 
 CenterAcceleration <- function(x) {
-  x[, "x"] <- x[, "x"] - median(x[, "x"])
-  x[, "y"] <- x[, "y"] - median(x[, "y"])
-  x[, "z"] <- x[, "z"] - median(x[, "z"])
-  x
+  x$x <- x$x - median(x$x)
+  x$y <- x$y - median(x$y)
+  x$z <- x$z - median(x$z)
+  return(x)
 }
-
 
 BoxVolumeFeature <- function(x) {
   x <- CenterAcceleration(x)
@@ -161,8 +156,5 @@ BoxVolumeFeature <- function(x) {
   ddVol <- diff(rddx) * diff(rddy) * diff(rddz)
   vols <- c(dVol, ddVol)
   names(vols) <- c("dVol", "ddVol")
-  vols
+  return(vols)
 }
-
-
-

@@ -9,6 +9,9 @@ ShapeGaitData <- function(x) {
   accel <- sapply(x, function(x) x$userAcceleration)
   accel <- t(accel)
   dat <- data.frame(timestamp, accel)
+  dat$x <- as.numeric(dat$x)
+  dat$y <- as.numeric(dat$y)
+  dat$z <- as.numeric(dat$z)
   return(dat)
 }
 
@@ -42,17 +45,17 @@ SingleAxisFeatures <- function(x, t, varName) {
 
 AccelLowPassFilter <- function(x, alpha) {
   n <- nrow(x)
-  ax <- x[, "x"]
-  ay <- x[, "y"]
-  az <- x[, "z"]
+  ax <- x$x
+  ay <- x$y
+  az <- x$z
   for (i in 2:n) {
     ax[i] <- alpha * ax[i] + (1 - alpha) * ax[i-1]
     ay[i] <- alpha * ay[i] + (1 - alpha) * ay[i-1]
     az[i] <- alpha * az[i] + (1 - alpha) * az[i-1]
   }
-  x[, "x"] <- ax
-  x[, "y"] <- ay
-  x[, "z"] <- az
+  x$x <- ax
+  x$y <- ay
+  x$z <- az
   return(x)
 }
 

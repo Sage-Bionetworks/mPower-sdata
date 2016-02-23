@@ -22,7 +22,7 @@ balanceMap <- synDownloadTableColumns(balanceTable, "deviceMotion_walking_rest.j
 allFeatures <- lapply(as.list(balanceMap), function(x){
   rawDat <- fromJSON(file=x)
   tmp <- ShapeBalanceData(rawDat)
-  GetBalanceFeatures(tmp, alpha=1)
+  GetBalanceFeatures(tmp)
 })
 names(allFeatures) <- names(balanceMap)
 

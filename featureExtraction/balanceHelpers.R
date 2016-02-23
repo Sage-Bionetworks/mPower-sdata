@@ -1,30 +1,32 @@
-require(RJSONIO)
+require(rjson)
 require(fractal)
 require(pracma)
 
-ShapeBalanceData <- function(x) {
+ShapeBalanceData <- function(x){
   timestamp <- sapply(x, function(x) x$timestamp)
   timestamp <- timestamp - timestamp[1]
   accel <- sapply(x, function(x) x$userAcceleration)
   accel <- t(accel)
-  accel <- accel * 9.8
-  dat <- cbind(timestamp, accel)
+  dat <- data.frame(timestamp, accel)
+  dat$x <- as.numeric(dat$x) * 9.8
+  dat$y <- as.numeric(dat$y) * 9.8
+  dat$z <- as.numeric(dat$z) * 9.8
   return(dat)
 }
 
-TrimData <- function(dat, timeStart = 5, timeEnd = NULL) {
-  time <- dat[, "timestamp"]  
+TrimData <- function(dat, timeStart = 5, timeEnd = NULL){
+  time <- dat$timestamp
   if (is.null(timeEnd)) {
     timeEnd <- time[length(time)]
   } 
   iStart <- min(which(time >= timeStart))
   iEnd <- max(which(time <= timeEnd))
   dat <- dat[iStart:iEnd,]
-  dat[, "timestamp"] <- dat[, "timestamp"] - dat[1, "timestamp"]
+  dat$timestamp <- dat$timestamp - dat$timestamp[1]
   return(dat)
 }
 
-GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL) {
+GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL){
   dat <- TrimData(dat, timeStart, timeEnd)
   x <- dat$x
   y <- dat$y
@@ -55,7 +57,7 @@ GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL) {
   return(c(out, bpa, dis))
 }
 
-FeaturesBpa <- function(post) {
+FeaturesBpa <- function(post){
   ft <- rep(NA, 3)
   time <- post[, 1] - post[1, 1] 
   dTime <- time[length(time)] - time[1]
@@ -115,7 +117,7 @@ ZCR <- function(x){
   }
 }
 
-GetDisplacement <- function(time, accel) {
+GetDisplacement <- function(time, accel){
   deltaTime <- diff(time)
   n <- length(deltaTime)
   vel <- rep(NA, n)
@@ -136,14 +138,14 @@ GetXYZDisplacement <- function(x){
   return(list(disX = disX, disY = disY, disZ = disZ))
 }
 
-CenterAcceleration <- function(x) {
+CenterAcceleration <- function(x){
   x$x <- x$x - median(x$x)
   x$y <- x$y - median(x$y)
   x$z <- x$z - median(x$z)
   return(x)
 }
 
-BoxVolumeFeature <- function(x) {
+BoxVolumeFeature <- function(x){
   x <- CenterAcceleration(x)
   aux <- GetXYZDisplacement(x)
   rdx <- range(aux$disX, na.rm = TRUE)

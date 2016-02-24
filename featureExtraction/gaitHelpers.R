@@ -29,7 +29,10 @@ SingleAxisFeatures <- function(x, t, varName) {
   rangeX <- auxX[[5]] - auxX[[1]]  
   acfX <- acf(x, lag.max = 1, plot = FALSE)$acf[2, 1, 1]
   zcrX <- ZCR(x)
-  dfaX <- DFA(x, sum.order = 1)[[1]]
+  dfaX <- try(DFA(x, sum.order = 1)[[1]], silent = TRUE)
+  if (inherits(dfaX, "try-error")) {
+    dfaX <- NA
+  }
   cvX <- Cv(x)
   tkeoX <- MeanTkeo(x)
   lspX <- lsp(cbind(t, x), plot = FALSE)

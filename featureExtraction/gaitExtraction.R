@@ -22,11 +22,15 @@ gaitMap <- synDownloadTableColumns(gaitTable, "deviceMotion_walking_outbound.jso
 allFeatures <- lapply(as.list(gaitMap), function(x){
   rawDat <- fromJSON(file=x)
   tmp <- ShapeGaitData(rawDat)
-  GetGaitFeatures(tmp, alpha=1)
+  res <- try(GetGaitFeatures(tmp, alpha=1), silent = TRUE)
+  if(inherits(res, "try-error")){
+    return(NULL)
+  } else{
+    return(res)
+  }
 })
 names(allFeatures) <- names(gaitMap)
 
-## SEVEN NULLS - OTHERWISE COMPLETE
 featDf <- do.call(rbind, allFeatures)
 featDf <- as.data.frame(featDf)
 tmpNames <- colnames(featDf)

@@ -46,7 +46,10 @@ GetBalanceFeatures <- function(dat, timeStart = 5, timeEnd = NULL){
   rangeAA <- auxAA[[5]] - auxAA[[1]]  
   acfAA <- acf(aa, lag.max = 1, plot = FALSE)$acf[2, 1, 1]
   zcrAA <- ZCR(aa)
-  dfaAA <- DFA(aa, sum.order = 1)[[1]]
+  dfaAA <- try(DFA(aa, sum.order = 1)[[1]], silent = TRUE)
+  if (inherits(dfaAA, "try-error")) {
+    dfAA <- NA
+  }
   out <- c(meanAA, sdAA, modeAA, skewAA, kurAA, q1AA, medianAA, q3AA, 
            iqrAA, rangeAA, acfAA, zcrAA, dfaAA)
   names(out) <- c("meanAA", "sdAA", "modeAA", "skewAA", "kurAA", "q1AA", 

@@ -37,7 +37,7 @@ CleanTappedButtonNone <- function(x) {
 
 require(synapseClient)
 
-tapping <- synTableQuery("SELECT * FROM syn4590864")
+tapping <- synTableQuery("SELECT * FROM syn5511439")
 dim(tapping@values)
 
 rnms <- rownames(tapping@values)

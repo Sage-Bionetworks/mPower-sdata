@@ -2,10 +2,7 @@ require(synapseClient)
 require(rjson)
 synapseLogin()
 
-firstDate <- as.Date("2015-03-09")
-lastDate <- as.Date("2015-09-09")
-
-## QUERY THE mPower PROJECT FOR ALL OF THE TABLES
+## QUERY THE mPower PROJECT (syn4993293) FOR ALL OF THE TABLES
 q <- synQuery('SELECT id, name FROM table WHERE parentId=="syn4993293"')
 
 ## READ IN THE FIRST 20 OBSERVATIONS FROM EACH OF THE TABLES (RESULTS ARE CACHED LOCALLY)
@@ -14,8 +11,12 @@ allDat <- lapply(as.list(q$table.id), function(x){
 })
 names(allDat) <- q$table.name
 
+## LOOK AT THE VALUES FOR THE FIRST TWO OBSERVATIONS IN TAPPING TABLE
+allDat$`Tapping Activity`@values[1:2, ]
+
 ## FOR TABLES WITH COLUMNS THAT CONTAIN FILES, WE CAN BULK DOWNLOAD THE FILES AND STORE A MAPPING
-## GET THE FILES ASSOCIATED WITH THE TAPPING EXERCISE
+## THE VALUE IN THE TABLE ABOVE IS CALLED A fileHandleId WHICH REFERENCES A FILE THAT CAN BE ACCESSED PROGRAMMATICALLY
+## GET THE FILES THAT CONTAIN SCREEN TAP SAMPLES FROM THE TAPPING EXERCISE
 ## THIS CACHES THE RETRIEVED FILES AS WELL
 tapMap <- synDownloadTableColumns(allDat$`Tapping Activity`, "tapping_results.json.TappingSamples")
 

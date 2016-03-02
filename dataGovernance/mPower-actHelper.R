@@ -109,5 +109,10 @@ mPowerAcceptIDU <- function(principalId, iduId){
   td <- synStore(td, retrieveData=TRUE)
   cat("tracking table updated")
   
+  require(githubr)
+  mpowerRepo <- getRepo('brian-bot/mPower-sdata')
+  sourceRepoFile(mpowerRepo, 'dataGovernance/iduWikiPop.R')
+  cat("community wiki updated")
+  
   return(onWeb(td@schema))
 }

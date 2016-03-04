@@ -1,3 +1,10 @@
+## The packages synapseClient and rGithubClient are not in standard CRAN,
+## so get them from synapse and github.
+source("http://depot.sagebase.org/CRAN.R")
+pkgInstall("synapseClient")
+install.packages("devtools")
+devtools::install_github("brian-bot/rGithubClient")
+
 require(synapseClient)
 require(rGithubClient)
 require(ggplot2)

@@ -1,6 +1,21 @@
-require(synapseClient)
-require(rGithubClient)
+## The packages synapseClient and rGithubClient are not in standard CRAN,
+## so get them from synapse and github.
+if(!require(synapseClient)){
+  ## The packages synapseClient is not on CRAN. Get it from sagebase.
+  source("http://depot.sagebase.org/CRAN.R")
+  pkgInstall("synapseClient")
+  require(synapseClient)
+}
+
+if(!require(rGithubClient)){
+  ## The packages rGithubClient is not on CRAN. Get it from using the useful devtools.
+  install.packages("devtools")
+  devtools::install_github("brian-bot/rGithubClient")
+  require(rGithubClient)
+}
+
 require(ggplot2)
+## The following will prompt for a username and password.
 synapseLogin()
 
 firstDate <- as.Date("2015-03-09")

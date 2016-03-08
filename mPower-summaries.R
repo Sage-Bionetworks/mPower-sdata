@@ -7,11 +7,11 @@ if(!require(synapseClient)){
   require(synapseClient)
 }
 
-if(!require(synapseClient)){
+if(!require(rGithubClient)){
   ## The packages rGithubClient is not on CRAN. Get it from using the useful devtools.
   install.packages("devtools")
   devtools::install_github("brian-bot/rGithubClient")
-  require(synapseClient)
+  require(rGithubClient)
 }
 
 require(ggplot2)

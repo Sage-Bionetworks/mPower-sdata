@@ -34,7 +34,7 @@ urlEncodings <- c('{' = "%7B",
                   '#' = "%23",
                   '$' = "%24")
 
-baseWiki <- "-----\n### Seeding a community in Parkinson research\nIt is the hope of Sage Bionetworks that by making the mPower data available to qualified researchers worldwide, that we can seed a community who will work together and share insights into Parkinson symptoms and modulators. Synapse Certified Users with verified profiles may request access to the mPower data set for research to benefit human health. Below are all of the data access requests that have been approved for the mPower data set. Take a look at what others are proposing to do, and reach out to any who you may be interested in working with!\n-----\n"
+baseWiki <- paste0("-----\n### Seeding a community in Parkinson research\nThere are now ", as.integer(nrow(theseOnes)), " approved projects leveraging the data shared broadly by mPower study participant. It is the hope of Sage Bionetworks that by participants making their data available to qualified researchers worldwide, that we can seed a community who will work together and share insights into Parkinson symptoms and modulators. Synapse Certified Users with verified profiles may request access to the mPower data resource for research to benefit human health. Below is a listing of all projects leveraging the mPower data. Take a look at what others are proposing to do, and reach out to any who you may be interested in working with!\n-----\n")
 fullWiki <- baseWiki
 for(i in 1:nrow(theseOnes)){
   userInfo <- synRestGET(paste0('/user/', theseOnes$principalId[i], '/bundle?mask=63'))

@@ -15,7 +15,7 @@ Researchers who are interested in accessing these data need to complete the foll
   1. Have a Synapse account (https://www.synapse.org)
   2. Have their Synapse User Profile validated by the Synapse Access and Compliance Team (ACT)
   3. Become a Synapse Certified User by completing a short quiz (https://www.synapse.org/#!Quiz:Certification)
-  4. Submit an Intended Data Use statement which will be **posted publically**
+  4. Submit an Intended Data Use statement which will be **posted publicly**
   5. Agree to the Conditions for Use associated with each data source (see DOIs for each data source) - some data may have additional conditions due to survey licensing
 
 Full instructions on data access are available on the [Synapse Project Wiki](https://www.synapse.org/#!Synapse:syn4993293/wiki/247860).

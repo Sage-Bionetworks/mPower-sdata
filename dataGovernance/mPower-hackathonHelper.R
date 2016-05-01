@@ -46,6 +46,6 @@ mPowerHackathonAccess <- function(userName){
   
   moreData <- Table("syn5964516", addThis)
   allData <- synStore(moreData, retrieveData=TRUE)
-  cat("tracking table updated")
-  return(onWeb(td@schema))
+  
+  return(cat("tracking table updated"))
 }

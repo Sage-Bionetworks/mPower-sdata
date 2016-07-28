@@ -40,7 +40,7 @@ for(i in 1:nrow(theseOnes)){
   userInfo <- synRestGET(paste0('/user/', theseOnes$principalId[i], '/bundle?mask=63'))
   
   iduLoc <- synDownloadTableFile(td, rownames(theseOnes)[i], "idu")
-  iduText <- paste(readLines(iduLoc), collapse="\n")
+  iduText <- paste(readLines(iduLoc, warn=FALSE), collapse="\n")
   newEntry <- paste0("##### **Researcher**: ", userInfo$verificationSubmission$firstName, " ", userInfo$verificationSubmission$lastName, " ([profile](", theseOnes$profileLink[i], "))\n",
                      "##### **ORCID**: ", userInfo$verificationSubmission$orcid, "\n",
                      "##### **Affiliation**: ", userInfo$verificationSubmission$company, "\n",
